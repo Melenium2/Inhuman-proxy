@@ -96,6 +96,7 @@ func (r RedisStorage) Set(ctx context.Context, code string, proxy ...string) err
 	return nil
 }
 
+// get all keys from redis store
 func (r RedisStorage) keys(ctx context.Context) ([]string, error) {
 	cmd := r.rdb.Keys(ctx, "*")
 	keys, err := cmd.Result()
