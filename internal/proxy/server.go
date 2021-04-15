@@ -77,6 +77,8 @@ func (s *Server) init() error {
 
 // Create additional routes
 func (s *Server) routes() error {
+	s.app.Get("/new/proxy", newProxy(s.proxyStore))
+
 	return nil
 }
 
