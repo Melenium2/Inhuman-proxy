@@ -16,7 +16,7 @@ const (
 type ProxyStorage interface {
 	GetRandom(ctx context.Context) (string, error)
 	Get(ctx context.Context, code string) (map[string]string, error)
-	Set(ctx context.Context, code string, proxy string) error
+	Set(ctx context.Context, code string, proxy ...string) error
 }
 
 type RedisStorage struct {
