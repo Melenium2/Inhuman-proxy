@@ -19,7 +19,7 @@ get:
 
 ## test: Run all tests in project
 test:
-	go test -mod=vendor -v -race -cover -bench=. ./...
+	go test -v -race -cover -bench=. ./...
 
 ## deploy: Run commands to deploy apprepo to container
 deploy:

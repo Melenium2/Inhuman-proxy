@@ -12,7 +12,7 @@ func main() {
 	logger, _ := zap.NewProduction(
 		zap.AddCaller(),
 	)
-	defer logger.Sync()
+	defer logger.Sync() //nolint:errcheck
 	log := logger.Sugar()
 
 	cfg, err := config.New()
