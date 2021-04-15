@@ -46,7 +46,7 @@ func (s *RedisStorageSuite) SetupTest() {
 }
 
 func (s *RedisStorageSuite) TestGet_ShouldReturnAllKeysFromRedis() {
-	defer s.clean()
+	defer s.clean() //nolint:errcheck
 
 	expected := map[string]interface{}{
 		"key1": "1",
@@ -73,7 +73,7 @@ func (s *RedisStorageSuite) TestGet_ShouldReturnEmptyResultFromRedis() {
 }
 
 func (s *RedisStorageSuite) TestSet_ShouldSetNewValueToRedis() {
-	defer s.clean()
+	defer s.clean() //nolint:errcheck
 
 	expected := []string{"1", "2", "3"}
 
@@ -94,7 +94,7 @@ func (s *RedisStorageSuite) TestSet_ShouldSetNewValueToRedis() {
 }
 
 func (s *RedisStorageSuite) TestSet_ShouldSetNewValueThenAppendNewValueToTheSameKey() {
-	defer s.clean()
+	defer s.clean() //nolint:errcheck
 
 	expected1 := []string{"1", "2", "3"}
 	expected2 := []string{"5", "6"}
@@ -118,7 +118,7 @@ func (s *RedisStorageSuite) TestSet_ShouldSetNewValueThenAppendNewValueToTheSame
 }
 
 func (s *RedisStorageSuite) TestGetRandom_ShouldReturnRandomProxyFromStorage() {
-	defer s.clean()
+	defer s.clean() //nolint:errcheck
 
 	code1 := "ru"
 	expected1 := []string{"p1", "1", "p2", "1"}
@@ -171,7 +171,7 @@ func (s *RedisStorageSuite) TestGetRandom_ShouldReturnExpectedValueIfOtherValues
 
 	for _, test := range tt {
 		s.T().Run(test.name, func(t *testing.T) {
-			defer s.clean()
+			defer s.clean() //nolint:errcheck
 
 			s.rdb.HSet(context.Background(), test.code1, test.expected1)
 			s.rdb.HSet(context.Background(), test.code2, test.expected2)
@@ -215,7 +215,7 @@ func (s *RedisStorageSuite) TestChangeBlockStatus_ShouldChangeBlockStatusOfProxy
 
 	for _, test := range tt {
 		s.T().Run(test.name, func(t *testing.T) {
-			defer s.clean()
+			defer s.clean() //nolint:errcheck
 
 			s.rdb.HSet(context.Background(), s.code, test.example)
 
@@ -254,7 +254,7 @@ func (s *RedisStorageSuite) TestDelete_ShouldRemoveProxyFromStorage() {
 
 	for _, test := range tt {
 		s.T().Run(test.name, func(t *testing.T) {
-			defer s.clean()
+			defer s.clean() //nolint:errcheck
 
 			s.rdb.HSet(context.Background(), s.code, test.example)
 
@@ -265,7 +265,7 @@ func (s *RedisStorageSuite) TestDelete_ShouldRemoveProxyFromStorage() {
 }
 
 func (s *RedisStorageSuite) TestDelete_ShouldRemoveKeyIfAfterRemovingItemLengthEqualsZero() {
-	defer s.clean()
+	defer s.clean() //nolint:errcheck
 
 	s.rdb.HSet(context.Background(), s.code, []string{"p1", "1"})
 
