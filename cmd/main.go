@@ -5,21 +5,30 @@ import (
 	"github.com/Melenium2/inhuman-reverse-proxy/internal/proxy"
 	"github.com/Melenium2/inhuman-reverse-proxy/internal/proxy/storage"
 	"go.uber.org/zap"
+	"log"
 	"os"
 	"os/signal"
 )
 
 func main() {
-	logger, _ := zap.NewProduction(
-		zap.AddCaller(),
-	)
-	defer logger.Sync() //nolint:errcheck
-	log := logger.Sugar()
-
 	cfg, err := config.New()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	var logger *zap.Logger
+	if cfg.DebugMode {
+		logger, _ = zap.NewDevelopment(
+			zap.AddCaller(),
+		)
+	} else {
+		logger, _ = zap.NewProduction(
+			zap.AddCaller(),
+		)
+	}
+
+	defer logger.Sync() //nolint:errcheck
+	log := logger.Sugar()
 
 	conn, err := storage.Connect(cfg.StorageConfig)
 	if err != nil {
