@@ -38,30 +38,34 @@ func New(client *redis.Client, logger *zap.SugaredLogger) *RedisStorage {
 
 // GetRandom returns first Free random proxy from store
 func (r RedisStorage) GetRandom(ctx context.Context) (string, error) {
-	cmd := r.rdb.RandomKey(ctx)
-	randKey, err := cmd.Result()
-	if err != nil {
-		return "", err
-	}
-	kvs, err := r.Get(ctx, randKey)
+	cmd := r.rdb.Keys(ctx, "*")
+	keys, err := cmd.Result()
 	if err != nil {
 		return "", err
 	}
 
-	randN := rand.Intn(len(kvs))
-	i := 0
-	for k, v := range kvs {
-		if i == randN {
-			if v == Blocked {
-				delete(kvs, k)
-				randN = rand.Intn(len(kvs))
-				i = 0
-				continue
-			} else {
-				return k, nil
+	kvs := make(map[string]string)
+	for i := 0; i < len(keys); i++ {
+		kv, err := r.Get(ctx, keys[i])
+		if err != nil {
+			return "", err
+		}
+		for k, v := range kv {
+			if v == Free {
+				kvs[k] = v
 			}
 		}
-		i++
+	}
+
+	if len(kvs) > 0 {
+		randN := rand.Intn(len(kvs))
+		i := 0
+		for k := range kvs {
+			if i == randN {
+				return k, nil
+			}
+			i++
+		}
 	}
 
 	return "", nil
