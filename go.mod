@@ -7,6 +7,7 @@ require (
 	github.com/go-redis/redis/v8 v8.8.0
 	github.com/gofiber/fiber/v2 v2.7.1
 	github.com/klauspost/compress v1.11.13 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/stretchr/testify v1.7.0
