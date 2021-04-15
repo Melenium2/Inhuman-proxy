@@ -41,7 +41,7 @@ func main() {
 	checker := storage.NewChecker(store, log, cfg.CheckerConfig)
 	go checker.Check()
 
-	log.Infof("start checking proxies")
+	log.Info("start checking proxies")
 
 	server := proxy.New(cfg, store, log)
 
