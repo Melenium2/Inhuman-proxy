@@ -13,9 +13,6 @@ const (
 	Blocked = "0"
 )
 
-// TODO
-//		health check all proxies and remove if proxy is unavailable or
-//		mute proxy if it has delay
 type ProxyStorage interface {
 	GetRandom(ctx context.Context) (string, error)
 	Get(ctx context.Context, code string) (map[string]string, error)
@@ -38,8 +35,7 @@ func New(client *redis.Client, logger *zap.SugaredLogger) *RedisStorage {
 
 // GetRandom returns first Free random proxy from store
 func (r RedisStorage) GetRandom(ctx context.Context) (string, error) {
-	cmd := r.rdb.Keys(ctx, "*")
-	keys, err := cmd.Result()
+	keys, err := r.keys(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -100,6 +96,16 @@ func (r RedisStorage) Set(ctx context.Context, code string, proxy ...string) err
 	return nil
 }
 
+func (r RedisStorage) keys(ctx context.Context) ([]string, error) {
+	cmd := r.rdb.Keys(ctx, "*")
+	keys, err := cmd.Result()
+	if err != nil {
+		return nil, err
+	}
+
+	return keys, nil
+}
+
 // block sets Blocked status to proxy address
 func (r RedisStorage) block(ctx context.Context, address string) error {
 	return r.changeBlockStatus(ctx, address, Blocked)
@@ -112,8 +118,7 @@ func (r RedisStorage) unblock(ctx context.Context, address string) error {
 
 // changeBlockStatus changes proxy address with given address
 func (r RedisStorage) changeBlockStatus(ctx context.Context, address string, status string) error {
-	cmd := r.rdb.Keys(ctx, "*")
-	keys, err := cmd.Result()
+	keys, err := r.keys(ctx)
 	if err != nil {
 		return err
 	}
@@ -137,8 +142,7 @@ func (r RedisStorage) changeBlockStatus(ctx context.Context, address string, sta
 
 // delete removes proxy address from redis storage
 func (r RedisStorage) delete(ctx context.Context, address string) error {
-	cmd := r.rdb.Keys(ctx, "*")
-	keys, err := cmd.Result()
+	keys, err := r.keys(ctx)
 	if err != nil {
 		return err
 	}
