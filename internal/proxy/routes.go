@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"errors"
 	"github.com/Melenium2/inhuman-reverse-proxy/internal/proxy/storage"
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,6 +11,9 @@ func newProxy(storage storage.ProxyStorage) func(ctx *fiber.Ctx) error {
 		var req RequestProxy
 		if err := req.UnmarshalJSON(ctx.Body()); err != nil {
 			return writeError(ctx, 400, err)
+		}
+		if req.Code == "" || len(req.Address) == 0 {
+			return writeError(ctx, 400, errors.New("request is empty"))
 		}
 		if err := storage.Set(ctx.Context(), req.Code, req.Address...); err != nil {
 			return writeError(ctx, 400, err)
