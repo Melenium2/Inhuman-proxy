@@ -25,9 +25,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Info("connect to store")
+
 	store := storage.New(conn, log)
 	checker := storage.NewChecker(store, log, cfg.CheckerConfig)
 	go checker.Check()
+
+	log.Infof("start checking proxies")
 
 	server := proxy.New(cfg, store, log)
 

@@ -5,6 +5,7 @@ import (
 	"github.com/Melenium2/inhuman-reverse-proxy/internal/config"
 	"github.com/Melenium2/inhuman-reverse-proxy/internal/proxy/storage"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"go.uber.org/zap"
 )
@@ -48,6 +49,7 @@ func (s *Server) Shutdown() error {
 // init creates new load balancing middleware and add to each request proxy settings
 func (s *Server) init() error {
 	s.app = fiber.New()
+	s.app.Use(logger.New())
 
 	s.app.Use(
 		proxy.Balancer(proxy.Config{
