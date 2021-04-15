@@ -1,11 +1,11 @@
 package proxy
 
 import (
+	"fmt"
 	"github.com/Melenium2/inhuman-reverse-proxy/internal/config"
 	"github.com/Melenium2/inhuman-reverse-proxy/internal/proxy/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
-	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"go.uber.org/zap"
 )
 
@@ -23,10 +23,11 @@ type Server struct {
 }
 
 // New creates new instance of proxy server
-func New(logger *zap.SugaredLogger, cfg config.Config) *Server {
+func New(cfg config.Config, store storage.ProxyStorage, logger *zap.SugaredLogger) *Server {
 	return &Server{
-		Config: cfg,
-		logger: logger,
+		Config:     cfg,
+		proxyStore: store,
+		logger:     logger,
 	}
 }
 
@@ -36,10 +37,10 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	return s.app.Listen(":19123")
+	return s.app.Listen(fmt.Sprintf(":%d", s.Config.Port))
 }
 
-// Stop the server
+// Shutdown the server
 func (s *Server) Shutdown() error {
 	return s.app.Shutdown()
 }
@@ -47,27 +48,27 @@ func (s *Server) Shutdown() error {
 // init creates new load balancing middleware and add to each request proxy settings
 func (s *Server) init() error {
 	s.app = fiber.New()
-	s.app.Use(requestid.New(
-		requestid.Config{
-			Header: "Inhuman-Request-ID",
-		},
-	))
 
-	// TODO
-	//		add logic with proxy
-	s.app.Use(proxy.Balancer(proxy.Config{
-		Servers: s.nodes(),
-		ModifyRequest: func(ctx *fiber.Ctx) error {
-			// TODO Get some proxy
-			ctx.Request().Header.Add("X-Inhuman-Proxy", "123")
-			return nil
-		},
-		ModifyResponse: func(ctx *fiber.Ctx) error {
-			// TODO Remove proxy and return response to user
-			ctx.Response().Header.Del("X-Inhuman-Proxy")
-			return nil
-		},
-	}))
+	s.app.Use(
+		proxy.Balancer(proxy.Config{
+			Servers: s.nodes(),
+			ModifyRequest: func(ctx *fiber.Ctx) error {
+				address, err := s.proxyStore.GetRandom(ctx.Context())
+				if err != nil {
+					s.logger.Infof("skip proxy, proxy store return err = %s", err)
+				}
+
+				ctx.Request().Header.Add(ProxyHeader, address)
+				ctx.Request().Header.Add(RequestIDHeader, generateRequestID())
+
+				return nil
+			},
+			ModifyResponse: func(ctx *fiber.Ctx) error {
+				ctx.Response().Header.Del(ProxyHeader)
+
+				return nil
+			},
+		}))
 
 	_ = s.routes()
 
@@ -76,6 +77,8 @@ func (s *Server) init() error {
 
 // Create additional routes
 func (s *Server) routes() error {
+	s.app.Get("/new/proxy", newProxy(s.proxyStore))
+
 	return nil
 }
 

@@ -13,7 +13,7 @@ import (
 
 var (
 	cfg = config.StorageConfig{
-		Addr:     "192.168.99.100:6379",
+		Addr:     "localhost:6379",
 		Username: "",
 		Password: "123456",
 		Database: 0,

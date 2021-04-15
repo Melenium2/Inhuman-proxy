@@ -24,9 +24,9 @@ type ProxyChecker struct {
 
 func NewChecker(storage *RedisStorage, logger *zap.SugaredLogger, config config.CheckerConfig) *ProxyChecker {
 	return &ProxyChecker{
-		storage: nil,
+		storage: storage,
 		cfg:     config,
-		log:     nil,
+		log:     logger,
 	}
 }
 

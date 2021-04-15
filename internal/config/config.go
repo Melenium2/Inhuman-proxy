@@ -10,7 +10,7 @@ type Config struct {
 	Port          int       `env:"PORT" envDefault:"19000"`
 	Servers       []url.URL `env:"SERVERS"`
 	StorageConfig struct {
-		Addr     string `env:"REDIS_ADDR" envDefault:"192.168.99.100:6379"`
+		Addr     string `env:"REDIS_ADDR" envDefault:"localhost:6379"`
 		Username string `env:"REDIS_USERNAME,required"`
 		Password string `env:"REDIS_PASSWORD,required"`
 		Database int    `env:"REDIS_DATABASE" envDefault:"0"`
@@ -22,7 +22,7 @@ type Config struct {
 }
 
 type StorageConfig struct {
-	Addr     string `env:"REDIS_ADDR" envDefault:"192.168.99.100:6379"`
+	Addr     string `env:"REDIS_ADDR" envDefault:"localhost:6379"`
 	Username string `env:"REDIS_USERNAME,required"`
 	Password string `env:"REDIS_PASSWORD,required"`
 	Database int    `env:"REDIS_DATABASE" envDefault:"0"`
@@ -35,7 +35,7 @@ type CheckerConfig struct {
 
 func New() (Config, error) {
 	cfg := Config{}
-	if err := env.Parse(cfg); err != nil {
+	if err := env.Parse(&cfg); err != nil {
 		return Config{}, err
 	}
 

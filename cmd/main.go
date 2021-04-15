@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Melenium2/inhuman-reverse-proxy/internal/config"
 	"github.com/Melenium2/inhuman-reverse-proxy/internal/proxy"
+	"github.com/Melenium2/inhuman-reverse-proxy/internal/proxy/storage"
 	"go.uber.org/zap"
 	"os"
 	"os/signal"
@@ -20,7 +21,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := proxy.New(log, cfg)
+	conn, err := storage.Connect(cfg.StorageConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+	store := storage.New(conn, log)
+	checker := storage.NewChecker(store, log, cfg.CheckerConfig)
+	go checker.Check()
+
+	server := proxy.New(cfg, store, log)
 
 	go func() {
 		if err := server.Start(); err != nil {

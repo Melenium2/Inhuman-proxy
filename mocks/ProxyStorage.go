@@ -58,12 +58,19 @@ func (_m *ProxyStorage) GetRandom(ctx context.Context) (string, error) {
 }
 
 // Set provides a mock function with given fields: ctx, code, proxy
-func (_m *ProxyStorage) Set(ctx context.Context, code string, proxy string) error {
-	ret := _m.Called(ctx, code, proxy)
+func (_m *ProxyStorage) Set(ctx context.Context, code string, proxy ...string) error {
+	_va := make([]interface{}, len(proxy))
+	for _i := range proxy {
+		_va[_i] = proxy[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, code)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
-		r0 = rf(ctx, code, proxy)
+	if rf, ok := ret.Get(0).(func(context.Context, string, ...string) error); ok {
+		r0 = rf(ctx, code, proxy...)
 	} else {
 		r0 = ret.Error(0)
 	}
