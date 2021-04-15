@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	DebugMode     bool      `env:"DEBUG_MODE" envDefault:"true"`
 	Port          int       `env:"PORT" envDefault:"19000"`
 	Servers       []url.URL `env:"SERVERS"`
 	StorageConfig struct {

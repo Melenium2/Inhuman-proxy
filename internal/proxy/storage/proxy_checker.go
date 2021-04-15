@@ -82,9 +82,8 @@ func (pc *ProxyChecker) check(ctx context.Context, address, status string) Check
 		if err := pc.storage.unblock(ctx, address); err != nil {
 			pc.log.Error(err)
 		}
+		pc.log.Infof("proxy %s has freedom", address)
 	}
-
-	pc.log.Infof("proxy %s has freedom", address)
 
 	return Freed
 }
