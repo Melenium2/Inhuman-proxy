@@ -11,7 +11,7 @@ build:
 
 ## run: Run go server
 run:
-	echo ./local.sh
+	./local.sh
 
 ## get: Run go get missing dependencies
 get:
