@@ -58,9 +58,10 @@ func (s *Server) init() error {
 				address, err := s.proxyStore.GetRandom(ctx.Context())
 				if err != nil {
 					s.logger.Infof("skip proxy, proxy store return err = %s", err)
+				} else {
+					ctx.Request().Header.Add(ProxyHeader, address)
 				}
 
-				ctx.Request().Header.Add(ProxyHeader, address)
 				ctx.Request().Header.Add(RequestIDHeader, generateRequestID())
 
 				return nil
