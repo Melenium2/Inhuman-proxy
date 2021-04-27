@@ -1,4 +1,4 @@
-#!/usr/bin/zsh
+#!/usr/bin/bash
 
 export SERVERS="localhost:19101" \
   && export REDIS_USERNAME="" \
